@@ -317,7 +317,10 @@ class PageAdmin(admin.ModelAdmin):
                 addlanguage = False
             if addlanguage:
                 from six.moves import urllib
-                splitted = list(urllib.parse.urlparse(response.url))
+                url = getattr(response, 'url', None)
+                if not url:
+                    url = response['Location']
+                splitted = list(urllib.parse.urlparse(url))
                 query = urllib.parse.parse_qs(splitted[4])
                 query['language'] = language
                 splitted[4] = urllib.parse.urlencode(query)
