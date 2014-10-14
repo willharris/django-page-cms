@@ -2,7 +2,11 @@
 import datetime
 from south.db import db
 from south.v2 import SchemaMigration
+from django.conf import settings as django_settings
 from django.db import models
+
+USER_MODEL_NAME = getattr(django_settings, 'AUTH_USER_MODEL', 'auth.User')
+USER_MODEL_OBJECT_NAME = USER_MODEL_NAME.split('.')[-1]
 
 class Migration(SchemaMigration):
 
@@ -16,7 +20,7 @@ class Migration(SchemaMigration):
         
         # Adding model 'pagepermission'
         db.create_table('pages_pagepermission', (
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm[USER_MODEL_NAME])),
             ('type', self.gf('django.db.models.fields.IntegerField')(default=0)),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('page', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['pages.Page'], null=True, blank=True)),
@@ -38,8 +42,8 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
         },
-        'auth.user': {
-            'Meta': {'object_name': 'User'},
+        USER_MODEL_NAME: {
+            'Meta': {'object_name': USER_MODEL_OBJECT_NAME},
             'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 8, 19, 17, 37, 19, 123021)'}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
@@ -72,7 +76,7 @@ class Migration(SchemaMigration):
         },
         'pages.page': {
             'Meta': {'ordering': "['tree_id', 'lft']", 'object_name': 'Page'},
-            'author': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'author': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['%s']" % USER_MODEL_NAME}),
             'creation_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 8, 19, 17, 37, 19, 120711)'}),
             'delegate_to': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'freeze_date': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
