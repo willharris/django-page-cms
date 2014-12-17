@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 
 from south.db import db
+from django.conf import settings as django_settings
 from django.db import models
 
 from pages import settings
 from pages.models import *
 
+USER_MODEL_NAME = getattr(django_settings, 'AUTH_USER_MODEL', 'auth.User')
+
+
 class Migration:
     
     def forwards(self, orm):
-        
         # Adding model 'Page'
         pages_page = [
                ('id', orm['pages.Page:id']),
@@ -44,7 +47,7 @@ class Migration:
             ('creation_date', orm['pages.Content:creation_date']),
         ))
         db.send_create_signal('pages', ['Content'])
-        
+
         # Adding model 'PageAlias'
         db.create_table('pages_pagealias', (
             ('id', orm['pages.PageAlias:id']),
@@ -52,7 +55,7 @@ class Migration:
             ('url', orm['pages.PageAlias:url']),
         ))
         db.send_create_signal('pages', ['PageAlias'])
-        
+
         # Adding model 'PagePermission'
         db.create_table('pages_pagepermission', (
             ('id', orm['pages.PagePermission:id']),
@@ -92,7 +95,7 @@ class Migration:
         
     
     page = {
-            'author': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'author': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['%s']" % USER_MODEL_NAME}),
             'creation_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'delegate_to': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -113,21 +116,9 @@ class Migration:
         page['tags'] = ('tagging.fields.TagField', [], {'null': 'True'})
     if settings.PAGE_USE_SITE_ID:
         page['sites'] = ('django.db.models.fields.related.ManyToManyField', [], {'default': '[1]', 'to': "orm['sites.Site']"})
-        
+
     models = {
-        'auth.group': {
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
-            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'blank': 'True'})
-        },
-        'auth.permission': {
-            'Meta': {'unique_together': "(('content_type', 'codename'),)"},
-            'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        'auth.user': {
+          USER_MODEL_NAME: {
             'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
@@ -142,6 +133,19 @@ class Migration:
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
+        'auth.group': {
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
+            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'blank': 'True'})
+        },
+        'auth.permission': {
+            'Meta': {'unique_together': "(('content_type', 'codename'),)"},
+            'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
+        },
+
         'contenttypes.contenttype': {
             'Meta': {'unique_together': "(('app_label', 'model'),)", 'db_table': "'django_content_type'"},
             'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
@@ -167,7 +171,7 @@ class Migration:
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'page': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['pages.Page']", 'null': 'True', 'blank': 'True'}),
             'type': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['%s']" % USER_MODEL_NAME})
         },
         'sites.site': {
             'Meta': {'db_table': "'django_site'"},
@@ -176,5 +180,5 @@ class Migration:
             'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
         }
     }
-    
+
     complete_apps = ['pages']

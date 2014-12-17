@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from south.db import db
+from django.conf import settings as django_settings
 from django.db import models
 from pages.models import *
 
 from pages import settings
+
+USER_MODEL_NAME = getattr(django_settings, 'AUTH_USER_MODEL', 'auth.User')
+
 
 class Migration:
     
@@ -35,7 +39,7 @@ class Migration:
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
         },
-        'auth.user': {
+        USER_MODEL_NAME: {
             'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
@@ -66,7 +70,7 @@ class Migration:
             'type': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         'pages.page': {
-            'author': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'author': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['%s']" % USER_MODEL_NAME}),
             'creation_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'delegate_to': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'freeze_date': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
@@ -93,7 +97,7 @@ class Migration:
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'page': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['pages.Page']", 'null': 'True', 'blank': 'True'}),
             'type': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['%s']" % USER_MODEL_NAME})
         },
         'sites.site': {
             'Meta': {'db_table': "'django_site'"},
